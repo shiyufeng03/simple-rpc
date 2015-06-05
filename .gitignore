@@ -1,0 +1,27 @@
+*.o 
+*.lo 
+*.la 
+*.al 
+.libs 
+*.so 
+*.so.[0-9]* 
+*.a 
+*.pyc 
+*.pyo 
+*.rej 
+*~ #*# 
+.#* 
+.*.swp 
+.DS_Store 
+obj 
+bin 
+*.suo 
+*.user 
+.* 
+!.gitignore
+debug-anycpu 
+target 
+*.patch 
+nb-configuration.xml 
+*.jar 
+dev_* _* thriftgen
