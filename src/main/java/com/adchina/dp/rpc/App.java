@@ -1,13 +1,10 @@
 package com.adchina.dp.rpc;
 
-/**
- * Hello world!
- *
- */
-public class App 
-{
-    public static void main( String[] args )
-    {
-        System.out.println( "Hello World!" );
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+public class App {
+    public static void main(String[] args) {
+        System.out.println("start server");
+        new ClassPathXmlApplicationContext("spring.xml");
     }
 }

@@ -25,3 +25,7 @@ target
 nb-configuration.xml 
 *.jar 
 dev_* _* thriftgen
+.settings
+.classpath
+.project
+/target
