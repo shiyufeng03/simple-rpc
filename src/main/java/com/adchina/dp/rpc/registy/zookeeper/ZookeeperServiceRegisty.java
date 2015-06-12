@@ -28,11 +28,13 @@ public class ZookeeperServiceRegisty implements ServiceRegisty {
 
         if (this.client.checkExists().forPath(Constant.ZOOKEEPER_RPC_SERVICE_ROOT) == null) {
             this.client.create().withMode(CreateMode.PERSISTENT).forPath(Constant.ZOOKEEPER_RPC_SERVICE_ROOT);
+            LOGGER.debug("create zookeeper path:" + Constant.ZOOKEEPER_RPC_SERVICE_ROOT);
         }
 
         String instancePath = Constant.ZOOKEEPER_RPC_SERVICE_ROOT + "/" + instanceName;
         if (this.client.checkExists().forPath(instancePath) == null) {
             this.client.create().withMode(CreateMode.PERSISTENT).forPath(instancePath);
+            LOGGER.debug("create zookeeper path:" + instancePath);
         }
     }
 
@@ -41,9 +43,12 @@ public class ZookeeperServiceRegisty implements ServiceRegisty {
             String servicePath = Constant.ZOOKEEPER_RPC_SERVICE_ROOT + "/" + this.instanceName + "/" + serviceName;
             if (this.client.checkExists().forPath(servicePath) == null) {
                 this.client.create().withMode(CreateMode.PERSISTENT).forPath(servicePath);
+                LOGGER.debug("create zookeeper path:" + servicePath);
             }
+            
             String AddressPath = servicePath + "/" + "address-";
             this.client.create().withMode(CreateMode.EPHEMERAL_SEQUENTIAL).forPath(AddressPath, serviceAddress.getBytes());
+            LOGGER.debug("create zookeeper path:" + AddressPath + ", child data:" + serviceAddress);
         } catch (Exception e) {
             LOGGER.error("", e);
         }

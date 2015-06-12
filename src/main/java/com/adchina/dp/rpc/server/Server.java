@@ -14,6 +14,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
@@ -26,7 +28,8 @@ import com.adchina.dp.rpc.common.model.Respose;
 import com.adchina.dp.rpc.registy.ServiceRegisty;
 
 public class Server implements ApplicationContextAware, InitializingBean{
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(Server.class);
+    
     private String address;
     private ServiceRegisty registy;
     private Map<String, Object> handlerMap = new HashMap<String, Object>();
@@ -41,6 +44,8 @@ public class Server implements ApplicationContextAware, InitializingBean{
     }
     
     public void afterPropertiesSet() throws Exception {
+        LOGGER.info("startup rpc server, address:" + this.address);
+        
         EventLoopGroup bossGroup = new NioEventLoopGroup();
         EventLoopGroup workerGroup = new NioEventLoopGroup();
         
@@ -72,6 +77,7 @@ public class Server implements ApplicationContextAware, InitializingBean{
                     registy.register(interfaceName, address);
                 }
             }
+            LOGGER.info("success startup rpc server, address:" + this.address);
             
             future.channel().closeFuture().sync();
         }finally{
@@ -91,7 +97,7 @@ public class Server implements ApplicationContextAware, InitializingBean{
                     serviceName = serviceName + "-" + serviceVersion;
                 }
                 
-                System.out.println("find service:" + serviceName);
+                LOGGER.info("find service:" + serviceName);
                 this.handlerMap.put(serviceName, entry.getValue());
             }
         }

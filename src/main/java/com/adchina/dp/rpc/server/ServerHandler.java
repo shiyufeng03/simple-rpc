@@ -4,6 +4,8 @@ import java.lang.reflect.Method;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.adchina.dp.rpc.common.model.Request;
 import com.adchina.dp.rpc.common.model.Respose;
@@ -13,7 +15,8 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 
 public class ServerHandler extends SimpleChannelInboundHandler<Request> {
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(ServerHandler.class);
+    
     private Map<String, Object> handlerMap;
 
     public ServerHandler(Map<String, Object> handlerMap) {
@@ -36,31 +39,35 @@ public class ServerHandler extends SimpleChannelInboundHandler<Request> {
     }
 
     private Object handler(Request request) throws Exception {
+        LOGGER.debug("start handler rpc request, requestId:" + request.getRequestId());
+        
         String interfaceName = request.getInterfaceName();
         String version = request.getVersion();
 
-        String key;
+        String serviceKey;
         if (StringUtils.isNotEmpty(version)) {
-            key = interfaceName + "-" + version;
+            serviceKey = interfaceName + "-" + version;
         } else {
-            key = interfaceName;
+            serviceKey = interfaceName;
         }
 
-        Object bean = handlerMap.get(key);
+        Object bean = handlerMap.get(serviceKey);
         if (bean == null) {
-            throw new RuntimeException(String.format("can't find service:", key));
+            throw new RuntimeException(String.format("can't find service:", serviceKey));
         }
 
         Method method = bean.getClass().getMethod(request.getMethodName(), request.getParamTypes());
         Object result = method.invoke(bean, request.getParams());
 
+        LOGGER.debug("success handler rpc request, requestId:" + request.getRequestId());
+        
         return result;
     }
     
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause)
             throws Exception {
-        cause.printStackTrace();
+        LOGGER.error("handler error", cause);
         ctx.close();
     }
 

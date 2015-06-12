@@ -27,11 +27,14 @@ public class ZookeeperServiceDiscovery implements ServiceDiscovery {
         RetryPolicy policy = new ExponentialBackoffRetry(1000, 3);
         this.client = CuratorFrameworkFactory.newClient(this.zkAddress, policy);
         this.client.start();
+        LOGGER.debug("start zookeeper client, instanceName:" + instanceName);
     }
 
     public String discover(String serviceName) {
         try {
             String servicePath = Constant.ZOOKEEPER_RPC_SERVICE_ROOT + "/" + instanceName + "/" + serviceName;
+            LOGGER.debug("start find service address, serviceName:" + serviceName + ", zookeeper path:" + servicePath);
+            
             if (this.client.checkExists().forPath(servicePath) == null) {
                 return null;
             }
@@ -49,7 +52,8 @@ public class ZookeeperServiceDiscovery implements ServiceDiscovery {
 
             String addressPath = servicePath + "/" + address;
             byte[] data = this.client.getData().forPath(addressPath);
-
+            
+            LOGGER.debug("find service address success, serviceName:" + serviceName);
             return new String(data);
         } catch (Exception e) {
             LOGGER.error("", e);
