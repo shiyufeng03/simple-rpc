@@ -8,10 +8,17 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
 
-public class RpcDecode extends ByteToMessageDecoder{
+/**
+ * 这里是一个通用的编码模型，通过genericClass来区分要
+ * 包括request和response的decoder
+ * 
+ * @author Steven.Shi
+ *
+ */
+public class RpcDecoder extends ByteToMessageDecoder{
     private Class<?> genericClass;
     
-    public RpcDecode(Class<?> genericClass){
+    public RpcDecoder(Class<?> genericClass){
         this.genericClass = genericClass;
     }
 

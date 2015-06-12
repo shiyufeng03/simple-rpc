@@ -1,11 +1,12 @@
 package com.adchina.dp.rpc.client;
 
-import com.adchina.dp.rpc.common.codec.RpcDecode;
+import com.adchina.dp.rpc.common.codec.RpcDecoder;
 import com.adchina.dp.rpc.common.codec.RpcEncoder;
 import com.adchina.dp.rpc.common.model.Request;
 import com.adchina.dp.rpc.common.model.Respose;
 
 import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInitializer;
@@ -40,26 +41,35 @@ public class Client extends SimpleChannelInboundHandler<Respose>{
             Bootstrap bootstrap = new Bootstrap();
             bootstrap.group(workerGroup);
             bootstrap.channel(NioSocketChannel.class);
-            bootstrap.option(ChannelOption.SO_KEEPALIVE, true);
             bootstrap.handler(new ChannelInitializer<SocketChannel>() {
 
                 @Override
                 protected void initChannel(SocketChannel ch) throws Exception {
                     ChannelPipeline pipe = ch.pipeline();
                     pipe.addLast(new RpcEncoder(Request.class));
-                    pipe.addLast(new RpcDecode(Respose.class));
+                    pipe.addLast(new RpcDecoder(Respose.class));
                     pipe.addLast(Client.this);
                 }
             });
+            bootstrap.option(ChannelOption.TCP_NODELAY, true);
             
             ChannelFuture future = bootstrap.connect(host, port).sync();
             
-            future.channel().closeFuture().sync();
+            Channel channel = future.channel();
+            channel.writeAndFlush(request).sync();
+            channel.closeFuture().sync();
             
             return respose;
         }finally{
             workerGroup.shutdownGracefully();
         }
+    }
+    
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause)
+            throws Exception {
+        cause.printStackTrace();
+        ctx.close();
     }
 
 }

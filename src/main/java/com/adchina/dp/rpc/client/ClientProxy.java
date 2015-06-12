@@ -60,7 +60,7 @@ public class ClientProxy {
                 if (respose.getExcption() != null) {
                     throw respose.getExcption();
                 } else {
-                    return respose;
+                    return respose.getResult();
                 }
 
             }

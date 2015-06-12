@@ -19,7 +19,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
-import com.adchina.dp.rpc.common.codec.RpcDecode;
+import com.adchina.dp.rpc.common.codec.RpcDecoder;
 import com.adchina.dp.rpc.common.codec.RpcEncoder;
 import com.adchina.dp.rpc.common.model.Request;
 import com.adchina.dp.rpc.common.model.Respose;
@@ -53,8 +53,8 @@ public class Server implements ApplicationContextAware, InitializingBean{
                 @Override
                 protected void initChannel(SocketChannel ch) throws Exception {
                     ChannelPipeline line = ch.pipeline();
-                    line.addLast(new RpcDecode(Request.class));
                     line.addLast(new RpcEncoder(Respose.class));
+                    line.addLast(new RpcDecoder(Request.class));
                     line.addLast(new ServerHandler(handlerMap));
                 }
             });
@@ -62,9 +62,10 @@ public class Server implements ApplicationContextAware, InitializingBean{
             bootstrap.option(ChannelOption.SO_BACKLOG, 512);
             bootstrap.childOption(ChannelOption.SO_KEEPALIVE, true);
             
-            String[] val = StringUtils.split(address, ":");
-            int port = Integer.parseInt(val[1]);
-            ChannelFuture future = bootstrap.bind(port).sync();
+            String[] array = StringUtils.split(address, ":");
+            String host = array[0];
+            int port = Integer.parseInt(array[1]);
+            ChannelFuture future = bootstrap.bind(host, port).sync();
             
             if(registy != null){
                 for(String interfaceName : handlerMap.keySet()){

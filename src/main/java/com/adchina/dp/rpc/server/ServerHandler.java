@@ -21,7 +21,7 @@ public class ServerHandler extends SimpleChannelInboundHandler<Request> {
     }
 
     @Override
-    protected void channelRead0(ChannelHandlerContext ctx, Request msg) throws Exception {
+    protected void channelRead0(final ChannelHandlerContext ctx, Request msg) throws Exception {
         Respose respose = new Respose();
         respose.setRequestId(msg.getRequestId());
 
@@ -55,6 +55,13 @@ public class ServerHandler extends SimpleChannelInboundHandler<Request> {
         Object result = method.invoke(bean, request.getParams());
 
         return result;
+    }
+    
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause)
+            throws Exception {
+        cause.printStackTrace();
+        ctx.close();
     }
 
 }

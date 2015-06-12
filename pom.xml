@@ -4,7 +4,7 @@
 
 	<groupId>com.adchina.dp.rpc</groupId>
 	<artifactId>simple-rpc</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.1</version>
 	<packaging>jar</packaging>
 
 	<name>simple-rpc</name>
